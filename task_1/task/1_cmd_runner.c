@@ -66,15 +66,18 @@ int strln(char* massiv)
 			massiv[i] = '\0';
 			break;
 		}
-		if (massiv[i] == ' ') 
-		{
-			prepare = 1;
+		if( prepare == 1)
+		{	
+			if (massiv[i] != ' ') 
+			{
+				prepare = 0;
+				len++;
+			}
 		}
 		else {
-			if (prepare == 1)
+			if (massiv[i] == ' ')
 			{
-				prepare == 0;
-				len++;
+				prepare = 1;
 			} 
 		}
 		i++;
@@ -102,18 +105,25 @@ int main()
 	int len;
 	char massiv[100];
 	char** argv;
-	pid_t pid = fork();
+	pid_t pid; 
 	while (Prepare) 
 	{
+		pid=fork();
 
 		switch(pid)
 		{	
+			
 			case -1: printf("ERROR in start fork");
-				 exit -1;	
+				 exit -1;
+
+			case 0: 
+				 len = strln(massiv);
+		       		 argv = distribution(len, massiv);
+				 execvp(argv[0], argv);		
 
 			
 
-			case 1:  waitpid(pid, &status, 0);
+			default: waitpid(pid, &status, 0);
 				 printf("Ret code - %d\n Push 'N'\n", WEXITSTATUS(status));
 
 			
@@ -122,11 +132,10 @@ int main()
 					 Prepare = 0;
 				 }
 
-			default:	
-				 len = strln(massiv);
-				 argv = distribution(len, massiv);		
-				 execvp(argv[0], argv);
-		} 
+						 
+				 
+		}
+
 	}	
 	return 0;
 }
